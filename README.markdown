@@ -77,6 +77,7 @@ All interaction for the server is done via `::artifactory`.
 * `artifactory::install`: Installs packages.
 * `artifactory::config`: Configures Artifactory.
 * `artifactory::service`: Manages service.
+* `artifactory::mysql`: Manages an automated mysql database
 
 ### Parameters
 
@@ -113,11 +114,19 @@ Tells the module whether or not to manage the java class. This defaults to true.
 
 If your organization actively manages the java installs across your environment set this to false.
 
+##### `root_password`
+
+Sets the root password for Puppet managed mysql database
+
 ##### `jdbc_driver_url`
 
 Sets the location for the jdbc driver. The built-in `file` type is used to retrieve the driver.
 
 This is required if using a new data source.
+
+##### `db_automate`
+
+Set to 'true' if you want Puppet to create a database. Only works with **mysql**. If `true`, we recommend using JDBC connector version 5.1.24. NOTE: Puppet may throw an error the first run while it waits for Artifactory to connect to database 
 
 ##### `db_type`
 
@@ -143,13 +152,16 @@ Optional setting for the binary storage provider. The type of database to config
 This means that metadata is stored in the database, but binaries are stored in the file system. The default location is under $ARTIFACTORY_HOME/data/filestore however this can be modified.
 
 ###### fullDb
-All the metadata and the binaries are stored as BLOBs in the database.
+All the metadata and the binaries are stored as BLOBs in the database, objects are cached as in cachedFS.
 
 ###### cachedFS
 Works the same way as filesystem but also has a binary LRU (Least Recently Used) cache for upload/download requests. Improves performance of instances with high IOPS (I/O Operations) or slow NFS access.
 
 ###### S3
 This is the setting used for S3 Object Storage.
+
+###### fullDbDirect
+All the metadata and the binaries are stored as BLOBs in the database. No caching occurs.
 
 ##### `pool_max_active`
 
@@ -163,13 +175,21 @@ Optional setting for the maximum number of pooled idle database connections Defa
 
 Optional setting for the maximum cache size. This value specifies the maximum cache size (in bytes) to allocate on the system for caching BLOBs.
 
+##### `binary_provider_base_data_dir`
+
+Optional setting for the artifactory filestore base location. Defaults to '$ARTIFACTORY_HOME/data'.
+
 ##### `binary_provider_filesystem_dir`
 
-Optional setting for the artifactory filestore location. The binary.provider.type is set to filesystem this value specifies the location of the binaries. Defaults to '$ARTIFACTORY_HOME/data/filestore'.
+Optional setting for the artifactory filestore location. If the binary.provider.type is set to filesystem this value specifies the location of the binaries in combination with binary_provider_base_data_dir. Defaults to 'filestore'.
 
 ##### `binary_provider_cache_dir`
 
 Optional setting for the location of the cache. This should be set to your $ARTIFACTORY_HOME directory directly (not on the NFS).
+
+##### `master_key`
+
+Optional setting for the master key that Artifactory uses to connect to the database. If specified, it ensures that if your node terminates, a new one can be spun up that can connect to the same database as before. Otherwise, Artifactory will generate a new master key on first run.
 
 ## Limitations
 

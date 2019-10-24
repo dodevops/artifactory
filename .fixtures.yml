@@ -1,7 +1,10 @@
 fixtures:
   forge_modules:
-    stdlib:      "puppetlabs/stdlib"
-    java:        "puppetlabs/java"
-    wget:        "puppet/wget"
+    stdlib:       "puppetlabs/stdlib"
+    java:         "puppetlabs/java"
+    yumrepo_core: "puppetlabs/yumrepo_core"
+    wget:         "puppet/wget"
+    mysql:        "puppetlabs/mysql"
+    systemd:      "camptocamp/systemd"
   symlinks:
-    artifactory: "#{source_dir}"
+    artifactory:  "#{source_dir}"
