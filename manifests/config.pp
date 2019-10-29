@@ -47,7 +47,7 @@ class artifactory::config {
         }
 
         -> file {
-          "/etc/facter/facts.d/artifactory_secret_fact.sh":
+          "/opt/puppetlabs/facter/facts.d/artifactory_secret_fact.sh":
             source => 'puppet:///modules/artifactory/artifactory_secret_fact.sh',
             mode => 'u+x',
         }
