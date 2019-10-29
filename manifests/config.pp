@@ -22,27 +22,35 @@ class artifactory::config {
         group  => 'artifactory',
       }
 
-      file { "${::artifactory::artifactory_home}/etc/.secrets/.temp.db.properties":
-        ensure  => file,
-        content => epp(
-          'artifactory/db.properties.epp',
-          {
-            db_url                         => $::artifactory::db_url,
-            db_username                    => $::artifactory::db_username,
-            db_password                    => $::artifactory::db_password,
-            db_type                        => $::artifactory::db_type,
-            binary_provider_type           => $::artifactory::binary_provider_type,
-            pool_max_active                => $::artifactory::pool_max_active,
-            pool_max_idle                  => $::artifactory::pool_max_idle,
-            binary_provider_cache_maxsize  => $::artifactory::binary_provider_cache_maxsize,
-            binary_provider_base_data_dir  => $::artifactory::binary_provider_base_data_dir,
-            binary_provider_filesystem_dir => $::artifactory::binary_provider_filesystem_dir,
-            binary_provider_cache_dir      => $::artifactory::binary_provider_cache_dir,
-          }
-        ),
-        mode    => '0640',
-        owner   => 'artifactory',
-        group   => 'artifactory',
+      if ($facts['artifactory_generated_secret_properties'] != 'true') {
+        file { "${::artifactory::artifactory_home}/etc/.secrets/.temp.db.properties":
+          ensure  => file,
+          content => epp(
+            'artifactory/db.properties.epp',
+            {
+              db_url                         => $::artifactory::db_url,
+              db_username                    => $::artifactory::db_username,
+              db_password                    => $::artifactory::db_password,
+              db_type                        => $::artifactory::db_type,
+              binary_provider_type           => $::artifactory::binary_provider_type,
+              pool_max_active                => $::artifactory::pool_max_active,
+              pool_max_idle                  => $::artifactory::pool_max_idle,
+              binary_provider_cache_maxsize  => $::artifactory::binary_provider_cache_maxsize,
+              binary_provider_base_data_dir  => $::artifactory::binary_provider_base_data_dir,
+              binary_provider_filesystem_dir => $::artifactory::binary_provider_filesystem_dir,
+              binary_provider_cache_dir      => $::artifactory::binary_provider_cache_dir,
+            }
+          ),
+          mode    => '0640',
+          owner   => 'artifactory',
+          group   => 'artifactory',
+        }
+
+        -> file {
+          "/etc/facter/facts.d/artifactory_secret_fact.sh":
+            source => 'puppet:///modules/artifactory/artifactory_secret_fact.sh',
+            mode => 'u+x',
+        }
       }
 
       file { "${::artifactory::artifactory_home}/etc/storage.properties":
